@@ -1,0 +1,67 @@
+$(document).ready(function(){
+    traerVale();
+    listarLegajos();
+    $("#codigo").on("keyup",function(){
+        var str = $("#codigo").val();
+        var xmlhttp = new XMLHttpRequest();
+        xmlhttp.onreadystatechange = function() {
+        if (this.readyState == 4 && this.status == 200) {
+            $("#tabla_seleccion").append(this.responseText);
+            $("input:radio[name=articulo]").on("click",function(){
+                var radioSelect = $("input:radio[name='articulo']:checked").val();
+                var xmlhttp = new XMLHttpRequest();
+                xmlhttp.onreadystatechange = function() {
+                if (this.readyState == 4 && this.status == 200) {
+                    $("#tabla_confirmacion").append(this.responseText);
+                    $("#cantidad").keypress(function(e) {
+                        var cantidad = $("#cantidad").val();
+                        var legajo = $("option:checked").val();
+                        var vale = traerVale();
+                        var code = (e.keyCode ? e.keyCode : e.which);
+                        if(code==13){
+                            var xmlhttp = new XMLHttpRequest();
+                            xmlhttp.onreadystatechange = function() {
+                            if (this.readyState == 4 && this.status == 200) {
+                                if(this.responseText == "OK"){
+                                    alert("Datos almacenados exitosamente");
+                                }
+                            }
+                            };
+                            xmlhttp.open("GET", "guardar_datos.php?cantidad="+cantidad+"&legajo="+legajo+"&codgaci="+radioSelect+"&vale="+vale, true);
+                            xmlhttp.send();
+                        }
+                    });
+                }
+            };
+            xmlhttp.open("GET", "select_stock.php?codgaci=" + radioSelect, true);
+            xmlhttp.send();
+            })
+        }
+    };
+    xmlhttp.open("GET", "listar_stock.php?codigo=" + str, true);
+    xmlhttp.send();
+    })
+    
+})
+
+function traerVale(){
+    var xhttp = new XMLHttpRequest();
+    xhttp.onreadystatechange = function() {
+        if (this.readyState == 4 && this.status == 200) {
+          $("#vale").html(this.responseText);
+        }
+      };
+      xhttp.open("GET", "conexion.php", true);
+      xhttp.send();
+    }
+
+function listarLegajos(){
+    var xhttp = new XMLHttpRequest();
+    xhttp.onreadystatechange = function() {
+        if (this.readyState == 4 && this.status == 200) {
+          $("#legajo").html(this.responseText);
+        }
+      };
+      xhttp.open("GET", "legajo.php", true);
+      xhttp.send();
+}
